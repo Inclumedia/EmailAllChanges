@@ -33,21 +33,25 @@ if( !defined('MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension. It is not a valid entry point' );
 }
 
-$wgExtensionCredits['parserhook'][] = array(
+$wgExtensionCredits['other'][] = array(
 	'path' => __FILE__,
 	'name' => 'EmailAllChanges',
 	'author' => 'Nathan Larson',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:EmailAllChanges',
 	'descriptionmsg' => 'emailallchanges-desc',
-	'version' => '1.0.0',
+	'version' => '1.0.1',
 );
-
 
 $wgHooks['GetPreferences'][] = 'EmailAllChangesTogglify';
 $wgHooks['AbortEmailNotification'][] = 'EmailAllChangesOnAbortEmailNotification';
 $wgExtensionMessagesFiles['EmailAllChanges'] = __DIR__ . '/EmailAllChanges.i18n.php';
+$wgEmailAllChangesRight = 'block';
 
 function EmailAllChangesTogglify( $user, &$preferences )  {
+	global $wgEmailAllChangesRight;
+	if( !in_array ( $wgEmailAllChangesRight, $user->getRights() ) ) {
+		return true;
+	}
 	// A checkbox
 	$preferences['emailallchanges'] = array(
 		'type' => 'toggle',
@@ -61,7 +65,10 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	// TODO: Come up with some way of weeding out ancient accounts whose users have long since
 	// quit editing. E.g. query the recentchanges and/or revision table to find out when the
 	// user last edited.
-	global $wgUsersNotifiedOnAllChanges;
+	global $wgUsersNotifiedOnAllChanges, $wgEmailAllChangesRight;
+	if( !in_array ( $wgEmailAllChangesRight, $editor->getRights() ) ) {
+		return true;
+	}
 	$dbr = wfGetDB( DB_SLAVE );
 	$res = $dbr->select( 'user_properties', 'up_user', array(
 		'up_property' => 'emailallchanges',
