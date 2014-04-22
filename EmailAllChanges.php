@@ -47,6 +47,7 @@ $wgHooks['AbortEmailNotification'][] = 'EmailAllChangesOnAbortEmailNotification'
 $wgExtensionMessagesFiles['EmailAllChanges'] = __DIR__ . '/EmailAllChanges.i18n.php';
 $wgEmailAllChangesRight = 'block';
 $wgEmailAllChangesExcludePages = array( 'MediaWiki:InterwikiMapBackup' );
+$wgEmailAllChangesExcludeUsers = array();
 
 function EmailAllChangesTogglify( $user, &$preferences )  {
 	global $wgEmailAllChangesRight;
@@ -66,8 +67,12 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	// TODO: Come up with some way of weeding out ancient accounts whose users have long since
 	// quit editing. E.g. query the recentchanges and/or revision table to find out when the
 	// user last edited.
-	global $wgUsersNotifiedOnAllChanges, $wgEmailAllChangesRight, $wgEmailAllChangesExcludePages;
-	if ( in_array( getPrefixedDBKey( $title ), $wgEmailAllChangesExcludePages ) ) {
+	global $wgUsersNotifiedOnAllChanges, $wgEmailAllChangesRight,
+		$wgEmailAllChangesExcludePages, $wgEmailAllChangesExcludeUsers;
+	if ( in_array( $title->getPrefixedDBKey(), $wgEmailAllChangesExcludePages ) ) {
+		return true;
+	}
+	if ( in_array( $editor->getName(), $wgEmailAllChangesExcludeUsers ) ) {
 		return true;
 	}
 	$dbr = wfGetDB( DB_SLAVE );
