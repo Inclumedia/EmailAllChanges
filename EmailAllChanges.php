@@ -39,7 +39,7 @@ $wgExtensionCredits['other'][] = array(
 	'author' => 'Nathan Larson',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:EmailAllChanges',
 	'descriptionmsg' => 'emailallchanges-desc',
-	'version' => '1.0.1',
+	'version' => '1.0.2',
 );
 
 $wgHooks['GetPreferences'][] = 'EmailAllChangesTogglify';
@@ -68,9 +68,6 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	// user last edited.
 	global $wgUsersNotifiedOnAllChanges, $wgEmailAllChangesRight, $wgEmailAllChangesExcludePages;
 	if ( in_array( getPrefixedDBKey( $title ), $wgEmailAllChangesExcludePages ) ) {
-		return true;
-	}
-	if( !in_array ( $wgEmailAllChangesRight, $editor->getRights() ) ) {
 		return true;
 	}
 	$dbr = wfGetDB( DB_SLAVE );
