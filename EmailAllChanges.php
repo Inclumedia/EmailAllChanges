@@ -48,6 +48,7 @@ $wgExtensionMessagesFiles['EmailAllChanges'] = __DIR__ . '/EmailAllChanges.i18n.
 $wgEmailAllChangesRight = 'block';
 $wgEmailAllChangesExcludePages = array( 'MediaWiki:InterwikiMapBackup' );
 $wgEmailAllChangesExcludeUsers = array();
+$wgEmailAllChangesExcludeGroups = array( 'bot' );
 
 function EmailAllChangesTogglify( $user, &$preferences )  {
 	global $wgEmailAllChangesRight;
@@ -73,6 +74,9 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 		return true;
 	}
 	if ( in_array( $editor->getName(), $wgEmailAllChangesExcludeUsers ) ) {
+		return true;
+	}
+	if ( array_intersect( $editor->getGroups(), $wgEmailAllChangesExcludeGroups ) ) {
 		return true;
 	}
 	$dbr = wfGetDB( DB_SLAVE );
