@@ -49,6 +49,9 @@ $wgEmailAllChangesRight = 'block';
 $wgEmailAllChangesExcludePages = array( 'MediaWiki:InterwikiMapBackup' );
 $wgEmailAllChangesExcludeUsers = array();
 $wgEmailAllChangesExcludeGroups = array( 'bot' );
+$wgEmailAllChangesOriginalList = array();
+$wgEmailAllChangesRunAlready = false;
+$wgHooks['InterwikiMapUpdateBackupPage'][] = 'EmailAllChangesInterwikiMapUpdateBackupPage';
 
 function EmailAllChangesTogglify( $user, &$preferences )  {
 	global $wgEmailAllChangesRight;
@@ -69,7 +72,12 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	// quit editing. E.g. query the recentchanges and/or revision table to find out when the
 	// user last edited.
 	global $wgUsersNotifiedOnAllChanges, $wgEmailAllChangesRight,
-		$wgEmailAllChangesExcludePages, $wgEmailAllChangesExcludeUsers;
+		$wgEmailAllChangesExcludePages, $wgEmailAllChangesExcludeUsers,
+		$wgEmailAllChangesOriginalList, $wgEmailAllChangesRunAlready;
+	if ( !$wgEmailAllChangesRunAlready ) {
+		$wgEmailAllChangesOriginalList = $wgUsersNotifiedOnAllChanges;
+	}
+	$wgEmailAllChangesRunAlready = true;
 	if ( in_array( $title->getPrefixedDBKey(), $wgEmailAllChangesExcludePages ) ) {
 		return true;
 	}
@@ -80,10 +88,14 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 		return true;
 	}
 	$dbr = wfGetDB( DB_SLAVE );
-	$res = $dbr->select( 'user_properties', 'up_user', array(
-		'up_property' => 'emailallchanges',
-		'up_value' => '1'
-		) );
+	$res = $dbr->select(
+		'user_properties',
+		'up_user',
+		array(
+			'up_property' => 'emailallchanges',
+			'up_value' => '1'
+		)
+	);
 	$userIDs = array();
 	foreach( $res as $row ) {
 		$userIDs[] = intval( $row->up_user );
@@ -95,5 +107,12 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	}
 	$wgUsersNotifiedOnAllChanges = array_unique( array_merge( $userNames,
 		$wgUsersNotifiedOnAllChanges ) );
+	return true;
+}
+
+// Don't send out notification of MediaWiki:InterwikiMapBackup changes to everyone
+function EmailAllChangesInterwikiMapUpdateBackupPage ( $summary ) {
+	global $wgEmailAllChangesOriginalList, $wgUsersNotifiedOnAllChanges;
+	$wgUsersNotifiedOnAllChanges = $wgEmailAllChangesOriginalList;
 	return true;
 }
