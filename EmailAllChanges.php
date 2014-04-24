@@ -73,7 +73,8 @@ function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	// user last edited.
 	global $wgUsersNotifiedOnAllChanges, $wgEmailAllChangesRight,
 		$wgEmailAllChangesExcludePages, $wgEmailAllChangesExcludeUsers,
-		$wgEmailAllChangesOriginalList, $wgEmailAllChangesRunAlready;
+		$wgEmailAllChangesOriginalList, $wgEmailAllChangesRunAlready,
+		$wgEmailAllChangesExcludeGroups;
 	if ( !$wgEmailAllChangesRunAlready ) {
 		$wgEmailAllChangesOriginalList = $wgUsersNotifiedOnAllChanges;
 	}
