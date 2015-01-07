@@ -39,11 +39,12 @@ $wgExtensionCredits['other'][] = array(
 	'author' => 'Nathan Larson',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:EmailAllChanges',
 	'descriptionmsg' => 'emailallchanges-desc',
-	'version' => '1.0.2',
+	'version' => '1.1',
 );
 
 $wgHooks['GetPreferences'][] = 'EmailAllChangesTogglify';
 $wgHooks['AbortEmailNotification'][] = 'EmailAllChangesOnAbortEmailNotification';
+$wgMessagesDirs['EmailAllChanges'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['EmailAllChanges'] = __DIR__ . '/EmailAllChanges.i18n.php';
 $wgEmailAllChangesRight = 'block';
 $wgEmailAllChangesExcludePages = array( 'MediaWiki:InterwikiMapBackup' );
