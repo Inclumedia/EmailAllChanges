@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Kghbln"
+		]
+	},
+	"tog-emailallchanges": "Schicke mir E-Mails zu jeder Seitenänderung im Wiki",
+	"emailallchanges-desc": "Ergänzt die Benutzeroption sich E-Mail-Benachrichtigungen zu allen Seitenänderungen des Wikis senden zu lassen"
+}
