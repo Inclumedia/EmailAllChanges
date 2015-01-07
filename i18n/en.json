@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Leucosticte"
+		]
+	},
+	"emailallchanges-desc": "Adds a preferences checkbox allowing users to have all changes to pages on the wiki emailed to them",
+	"tog-emailallchanges": "Email me when any page on the wiki is changed"
+}
