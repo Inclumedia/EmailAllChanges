@@ -5,5 +5,6 @@
 		]
 	},
 	"emailallchanges-desc": "Adds a preferences checkbox allowing users to have all changes to pages on the wiki emailed to them",
-	"tog-emailallchanges": "Email me when any page on the wiki is changed"
+	"tog-emailallchanges": "Email me when any page on the wiki is changed",
+	"tog-emailmychanges": "Email me when I make a change to a page on the wiki"
 }

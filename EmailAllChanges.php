@@ -39,7 +39,7 @@ $wgExtensionCredits['other'][] = array(
 	'author' => 'Nathan Larson',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:EmailAllChanges',
 	'descriptionmsg' => 'emailallchanges-desc',
-	'version' => '1.1',
+	'version' => '1.2',
 );
 
 $wgHooks['GetPreferences'][] = 'EmailAllChangesTogglify';
@@ -47,26 +47,76 @@ $wgHooks['AbortEmailNotification'][] = 'EmailAllChangesOnAbortEmailNotification'
 $wgMessagesDirs['EmailAllChanges'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['EmailAllChanges'] = __DIR__ . '/EmailAllChanges.i18n.php';
 $wgEmailAllChangesRight = 'block';
+$wgEmailAllChangesMyChangesRight = 'edit';
 $wgEmailAllChangesExcludePages = array( 'MediaWiki:InterwikiMapBackup' );
 $wgEmailAllChangesExcludeUsers = array();
 $wgEmailAllChangesExcludeGroups = array( 'bot' );
 $wgEmailAllChangesOriginalList = array();
 $wgEmailAllChangesRunAlready = false;
 $wgHooks['InterwikiMapUpdateBackupPage'][] = 'EmailAllChangesInterwikiMapUpdateBackupPage';
+$wgHooks['PageContentSaveComplete'][] = 'EmailAllChangesSendEmailToEditor';
 
+// Create toggles for emailing changes
 function EmailAllChangesTogglify( $user, &$preferences )  {
-	global $wgEmailAllChangesRight;
-	if( !in_array ( $wgEmailAllChangesRight, $user->getRights() ) ) {
-		return true;
+	global $wgEmailAllChangesRight, $wgEmailAllChangesMyChangesRight;
+	$disableEmailPrefs = true;
+	if ( $user->getEmail() ) {
+		if ( $user->getEmailAuthenticationTimestamp() ) {
+			$disableEmailPrefs = false;
+		}
 	}
-	// A checkbox
-	$preferences['emailallchanges'] = array(
-		'type' => 'toggle',
-		'label-message' => 'tog-emailallchanges', // a system message
-		'section' => 'personal/email',
-	);
+	if( in_array ( $wgEmailAllChangesRight, $user->getRights() ) ) {
+		// A checkbox
+		$preferences['emailallchanges'] = array(
+			'type' => 'toggle',
+			'label-message' => 'tog-emailallchanges', // a system message
+			'section' => 'personal/email',
+			'disabled' => $disableEmailPrefs,
+		);
+	}
+	if( in_array ( $wgEmailAllChangesMyChangesRight, $user->getRights() ) ) {
+		// A checkbox
+		$preferences['emailmychanges'] = array(
+			'type' => 'toggle',
+			'label-message' => 'tog-emailmychanges', // a system message
+			'section' => 'personal/email',
+			'disabled' => $disableEmailPrefs,
+		);
+	}
 	return true;
 }
+
+// TODO: Write code to email users copies of revisions they make. You'll need to code it from
+// scratch. Use https://gerrit.wikimedia.org/r/#/c/101443/ for inspiration.
+function EmailAllChangesSendEmailToEditor( $article, $user, $content, $summary, $isMinor,
+	$isWatch, $section, $flags, $revision, $status, $baseRevId ) {
+	global $wgSitename, $wgPasswordSender;
+	if ( !$user->getOption( 'emailmychanges' ) || !$revision ) {
+		return true;
+	}
+	$from = new MailAddress( $wgPasswordSender,
+		wfMessage( 'emailsender' )->inContentLanguage()->text() );
+	$to = MailAddress::newFromUser( $user );
+	$prefixText = $article->getTitle()->getPrefixedText();
+	$revisionId = $revision->getId();
+	$subject = "$wgSitename: You changed page $prefixText";
+	$timestamp = $revision->getTimestamp();
+	$body = $user->getName() . ",\n\n";
+	$body .= "On $wgSitename, you changed page $prefixText\n";
+	$body .= "The revision ID was: $revisionId\n";
+	$body .= "The timestamp was: $timestamp\n";
+		if ( $isMinor ) {
+		$body .= "This was a minor edit.\n";
+	}
+	$body .= "The summary was: $summary\n";
+	$body .= "The content was as follows:\n\n";
+	$body .= ContentHandler::getContentText( $content );
+	$replyto = null;
+	UserMailer::send( $to, $from, $subject, $body, $replyto );
+	#die ( $to );
+	return true;
+}
+
 
 function EmailAllChangesOnAbortEmailNotification ( $editor, $title ) {
 	// TODO: Come up with some way of weeding out ancient accounts whose users have long since
