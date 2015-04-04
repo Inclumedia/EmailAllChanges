@@ -6,5 +6,10 @@
 	},
 	"emailallchanges-desc": "Adds a preferences checkbox allowing users to have all changes to pages on the wiki emailed to them",
 	"tog-emailallchanges": "Email me when any page on the wiki is changed",
-	"tog-emailmychanges": "Email me when I make a change to a page on the wiki"
+	"tog-emailmychanges": "Email me when I make a change to a page on the wiki",
+	"emailallchanges-subject": "$1: You changed $2",
+	"emailallchanges-minoredit": "This was a minor edit.\n",
+	"emailallchanges-blanksummary": "The summary was left blank.",
+	"emailallchanges-summary": "The summary was: $1",
+	"emailallchanges-body": "$1,\n\nOn $2, you changed $3.\nThe revision ID was: $4\nThe timestamp was: $5\n$6\n$7The content was as follows:\n\n$8"
 }

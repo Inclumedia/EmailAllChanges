@@ -46,7 +46,7 @@ $wgHooks['GetPreferences'][] = 'EmailAllChangesTogglify';
 $wgHooks['AbortEmailNotification'][] = 'EmailAllChangesOnAbortEmailNotification';
 $wgMessagesDirs['EmailAllChanges'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['EmailAllChanges'] = __DIR__ . '/EmailAllChanges.i18n.php';
-$wgEmailAllChangesRight = 'block';
+$wgEmailAllChangesRight = 'userrights';
 $wgEmailAllChangesMyChangesRight = 'edit';
 $wgEmailAllChangesExcludePages = array( 'MediaWiki:InterwikiMapBackup' );
 $wgEmailAllChangesExcludeUsers = array();
@@ -94,23 +94,36 @@ function EmailAllChangesSendEmailToEditor( $article, $user, $content, $summary, 
 	if ( !$user->getOption( 'emailmychanges' ) || !$revision ) {
 		return true;
 	}
+	$username = $user->getName();
 	$from = new MailAddress( $wgPasswordSender,
 		wfMessage( 'emailsender' )->inContentLanguage()->text() );
 	$to = MailAddress::newFromUser( $user );
 	$prefixText = $article->getTitle()->getPrefixedText();
 	$revisionId = $revision->getId();
-	$subject = "$wgSitename: You changed page $prefixText";
+	$subject = wfMessage( 'emailallchanges-subject' )
+		->params( $wgSitename, $prefixText )->plain();
+	#$subject = str_replace( $wgSitename, "{{SITENAME}}", $subject );
+	#$subject = str_replace( $prefixText, "{{PREFIXTEXT", $subject );
 	$timestamp = $revision->getTimestamp();
-	$body = $user->getName() . ",\n\n";
-	$body .= "On $wgSitename, you changed page $prefixText\n";
-	$body .= "The revision ID was: $revisionId\n";
-	$body .= "The timestamp was: $timestamp\n";
-		if ( $isMinor ) {
-		$body .= "This was a minor edit.\n";
+	$minorEdit = '';
+	if ( $isMinor ) {
+		$minorEdit = wfMessage( 'emailallchanges-minoredit' )->plain();
 	}
-	$body .= "The summary was: $summary\n";
-	$body .= "The content was as follows:\n\n";
-	$body .= ContentHandler::getContentText( $content );
+	if ( !$summary ) {
+		$bodySummary = wfMessage( 'emailallchanges-blanksummary' )->plain();
+	} else {
+		$bodySummary = wfMessage( 'emailallchanges-summary' )->params( $summary )->plain();
+	}
+	$body = wfMessage( 'emailallchanges-body' )->params(
+		$username,
+		$wgSitename,
+		$prefixText,
+		$revisionId,
+		$timestamp,
+		$minorEdit,
+		$summary,
+		ContentHandler::getContentText( $content )
+	)->plain();
 	$replyto = null;
 	UserMailer::send( $to, $from, $subject, $body, $replyto );
 	#die ( $to );
