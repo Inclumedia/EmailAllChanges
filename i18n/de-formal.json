@@ -1,0 +1,9 @@
+{
+	"@metadata": {
+		"authors": [
+			"Kghbln"
+		]
+	},
+	"emailallchanges-subject": "$1: Sie haben Seite $2 geändert",
+	"emailallchanges-body": "Hallo $1,\n\nAm $2 haben Sie die Seite $3 bearbeitet.\nDie Bearbeitungskennung lautet: $4\nDer Zeitpunkt war: $5\n$6\n$7\nDer Inhalt war:\n\n$8"
+}
