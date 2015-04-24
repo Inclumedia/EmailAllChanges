@@ -6,5 +6,10 @@
 	},
 	"emailallchanges-desc": "Ergänzt die Benutzeroption sich E-Mail-Benachrichtigungen zu allen Seitenänderungen des Wikis senden zu lassen",
 	"tog-emailallchanges": "Schick mir E-Mails zu jeder Seitenänderung im Wiki",
-	"tog-emailmychanges": "Schick mir E-Mails zu jeder Seitenänderung, die ich im Wiki mache"
+	"tog-emailmychanges": "Schick mir E-Mails zu jeder Seitenänderung, die ich im Wiki mache",
+	"emailallchanges-subject": "$1: Du hast Seite $2 geändert",
+	"emailallchanges-minoredit": "Dies war eine gefingfügige Änderung.\n",
+	"emailallchanges-blanksummary": "Als Zusammenfassung zur Bearbeitung wurde nichts angegeben.",
+	"emailallchanges-summary": "Als Zusammenfassung zur Bearbeitung wurde Folgendes angegeben: $1",
+	"emailallchanges-body": "Hallo $1,\n\nAm $2 hast Du die Seite $3 bearbeitet.\nDie Bearbeitungskennung lautet: $4\nDer Zeitpunkt war: $5\n$6\n$7\nDer Inhalt war:\n\n$8"
 }
